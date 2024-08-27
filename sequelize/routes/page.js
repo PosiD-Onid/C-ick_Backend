@@ -1,4 +1,5 @@
 const express = require('express');
+const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
 const {
     renderProfile,
     renderSignup,
@@ -12,9 +13,14 @@ const {
 
 const router = express.Router();
 
-router.get('/profile', renderProfile);
+router.use((req, res, next) => {
+    res.locals.user = req.user;
+    next();
+});
 
-router.get('/signup', renderSignup);
+router.get('/profile', isLoggedIn, renderProfile);
+
+router.get('/signup', isNotLoggedIn, renderSignup);
 
 router.get('/signin', renderSignin);
 
