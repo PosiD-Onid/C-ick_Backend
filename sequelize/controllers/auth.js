@@ -64,8 +64,8 @@ exports.signin = (req, res, next) => {
 };
 
 
-exports.logout = (req, res) => {
-    req.logout(() => {
+exports.signout = (req, res) => {
+    req.signout(() => {
         res.redirect('/');
     });
 };

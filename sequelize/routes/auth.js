@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 
 const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
-const { s_signup, t_signup, signin, logout } = require('../controllers/auth');
+const { s_signup, t_signup, signin, signout } = require('../controllers/auth');
 
 const router = express.Router();
 
@@ -15,7 +15,7 @@ router.post('/t_signup', isNotLoggedIn, t_signup);
 // POST /auth/signin (로그인)
 router.post('/signin', isNotLoggedIn, signin);
 
-// POST /auth/logout (로그아웃)
-router.post('/logout', isLoggedIn, logout);
+// POST /auth/signout (로그아웃)
+router.post('/signout', isLoggedIn, signout);
 
 module.exports = router;
