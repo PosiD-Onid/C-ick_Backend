@@ -13,11 +13,6 @@ const {
 
 const router = express.Router();
 
-router.use((req, res, next) => {
-    res.locals.user = req.user;
-    next();
-});
-
 router.get('/profile', isLoggedIn, renderProfile);
 
 router.get('/signup', isNotLoggedIn, renderSignup);
@@ -28,19 +23,19 @@ router.get('/alarm', renderAlarm);
 
 router.get('/teacherpage', (req, res, next) => {
     if (req.user && req.user.role === 'teacher') {
-        return renderTeacherpage(req, res, next); // 선생님 페이지 렌더링
+        return renderTeacherpage(req, res, next);
     } else {
-        res.status(403).send('접근 권한이 없습니다'); // 권한이 없는 경우
+        res.status(403).send('접근 권한이 없습니다');
     }
 });
 
 router.get('/myresults', (req, res, next) => {
     if (req.user && req.user.role === 'teacher') {
-        return renderTeacherResults(req, res, next); // 선생님 결과 페이지 렌더링
+        return renderTeacherResults(req, res, next);
     } else if (req.user && req.user.role === 'student') {
-        return renderStudentResults(req, res, next); // 학생 결과 페이지 렌더링
+        return renderStudentResults(req, res, next);
     } else {
-        res.status(403).send('접근 권한이 없습니다'); // 권한이 없는 경우
+        res.status(403).send('접근 권한이 없습니다');
     }
 });
 

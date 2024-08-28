@@ -8,6 +8,7 @@ class Students extends Sequelize.Model {
                 allowNull: false,
                 unique: true,
                 primaryKey: true,
+                defaultValue: '0000'
             },
             s_id: {
                 type: Sequelize.STRING(10),
@@ -19,13 +20,14 @@ class Students extends Sequelize.Model {
                 allowNull: false,
             },
             s_pass: {
-                type: Sequelize.STRING(15),
+                type: Sequelize.STRING(255),
                 allowNull: false,
             },
             s_year: {
                 type: Sequelize.STRING(4),
                 allowNull: false,
                 primaryKey: true,
+                defaultValue: 0,
             }
         }, {
             sequelize,

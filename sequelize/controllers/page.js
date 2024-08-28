@@ -27,9 +27,22 @@ exports.renderStudentResults = (req, res) => {
 };
 
 exports.renderMain = (req, res, next) => {
-    const twits = [];
-    res.render('main', {
-        title: 'C!ick',
-        twits,
-    });
+    const twits = []; // 데이터 예시
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>C!ick</title>
+        </head>
+        <body>
+            <h1>Welcome to C!ick</h1>
+            <p>This is the main page.</p>
+            <ul>
+                ${twits.map(twit => `<li>${twit}</li>`).join('')}
+            </ul>
+        </body>
+        </html>
+    `);
 };

@@ -1,8 +1,7 @@
 const bcrypt = require('bcrypt');
 const passport = require('passport');
-// const User = require('../models/user');
 const Students = require('../models/students');
-const Teacher = require('../models/teachers');
+const Teachers = require('../models/teachers');
 
 exports.s_signup = async (req, res, next) => {
     const { s_id, s_name, s_pass } = req.body;
@@ -27,12 +26,12 @@ exports.s_signup = async (req, res, next) => {
 exports.t_signup = async (req, res, next) => {
     const { t_id, t_name, t_subject, t_pass } = req.body;
     try {
-        const exTeachers = await Teacher.findOne({ where: { t_id } });
+        const exTeachers = await Teachers.findOne({ where: { t_id } });
         if (exTeachers) {
             return res.redirect('/signup?error=exist');
         }
         const hash = await bcrypt.hash(t_pass, 8);
-        await Teacher.create({
+        await Teachers.create({
             t_id,
             t_name,
             t_subject,
@@ -44,3 +43,29 @@ exports.t_signup = async (req, res, next) => {
         return next(error);
     }
 }
+
+exports.signin = (req, res, next) => {
+    passport.authenticate('local', (authError, user, info) => {
+        if (authError) {
+            console.error(authError);
+            return next(authError);
+        }
+        if (!user) {
+            return res.redirect(`/?error=${info.message}`);
+        }
+        return req.logIn(user, (signinError) => {
+            if (signinError) {
+                console.error(signinError);
+                return next(signinError);
+            }
+            return res.redirect('/');
+        });
+    })(req, res, next);
+};
+
+
+exports.logout = (req, res) => {
+    req.logout(() => {
+        res.redirect('/');
+    });
+};

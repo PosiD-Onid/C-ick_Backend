@@ -10,7 +10,7 @@ class Teachers extends Sequelize.Model {
                 primaryKey: true,
             },
             t_pass: {
-                type: Sequelize.STRING(15),
+                type: Sequelize.STRING(255),
                 allowNull: false,
             },
             t_name: {
@@ -19,7 +19,7 @@ class Teachers extends Sequelize.Model {
             },
             t_subject: {
                 type: Sequelize.STRING(20),
-                allowNull: true,
+                allowNull: false,
             }
         }, {
             sequelize,

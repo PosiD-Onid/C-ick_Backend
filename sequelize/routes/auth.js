@@ -2,17 +2,20 @@ const express = require('express');
 const passport = require('passport');
 
 const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
-const { signup, signin, logout } = require('../controllers/auth');
+const { s_signup, t_signup, signin, logout } = require('../controllers/auth');
 
 const router = express.Router();
 
-// POST /auth/signup
-router.post('/signup', isNotLoggedIn, signup);
+// POST /auth/s_signup (학생 가입)
+router.post('/s_signup', isNotLoggedIn, s_signup);
 
-// POST /auth/signin
+// POST /auth/t_signup (교사 가입)
+router.post('/t_signup', isNotLoggedIn, t_signup);
+
+// POST /auth/signin (로그인)
 router.post('/signin', isNotLoggedIn, signin);
 
-// GET /auth/logout
+// POST /auth/logout (로그아웃)
 router.post('/logout', isLoggedIn, logout);
 
 module.exports = router;
