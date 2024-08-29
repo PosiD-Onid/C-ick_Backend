@@ -8,8 +8,15 @@ const {
     renderTeacherResults,
     renderStudentResults,
     renderMain,
-    createLesson
-} = require('../controllers/d_page');
+    createLesson,
+    readLessons,
+    readLesson,
+    updateLesson,
+    createPerformance,
+    getPerformances,
+    getPerformance,
+    updatePerformance,
+} = require('../controllers/page');
 
 const router = express.Router();
 
@@ -37,7 +44,23 @@ router.get('/myresults', (req, res, next) => {
     }
 });
 
-router.post('/create', createLesson);
+// Lesson
+router.post('/create', /* isLoggedIn, isTeachers */ createLesson);
+
+router.get('/read', /* isLoggedIn, */ readLessons);
+
+router.get('/read/:id', /* isLoggedIn, */ readLesson);
+
+router.put('/update/:id', /* isLoggedIn, isTeachers */ updateLesson);
+
+// Performance
+router.post('/create', /* isLoggedIn, isTachers */ createPerformance);
+
+router.get('/read', /* isLoggedIn, */ getPerformances);
+
+router.get('/read/:id', /* isLoggedIn, */ getPerformance);
+
+router.put('/update/:id', /* isLoggedIn, isTachers, */ updatePerformance);
 
 router.get('/', renderMain);
 
