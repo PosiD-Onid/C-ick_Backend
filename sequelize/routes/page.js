@@ -4,7 +4,6 @@ const {
     renderProfile,
     renderSignup,
     renderSignin,
-    renderAlarm,
     renderTeacherpage,
     renderTeacherResults,
     renderStudentResults,
@@ -18,8 +17,6 @@ router.get('/profile', isLoggedIn, renderProfile);
 router.get('/signup', isNotLoggedIn, renderSignup);
 
 router.get('/signin', renderSignin);
-
-router.get('/alarm', renderAlarm);
 
 router.get('/teacherpage', (req, res, next) => {
     if (req.user && req.user.role === 'teacher') {

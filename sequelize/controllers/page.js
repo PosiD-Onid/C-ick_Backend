@@ -10,10 +10,6 @@ exports.renderSignin = (req, res) => {
     res.render('signin', { title: '로그인 - C!ick' });
 };
 
-exports.renderAlarm = (req, res) => {
-    res.render('alarm', { title: '알림 - C!ick' });
-};
-
 exports.renderTeacherpage = (req, res) => {
     res.render('teacherpage', { title: '선생님 페이지 - C!ick' });
 };
