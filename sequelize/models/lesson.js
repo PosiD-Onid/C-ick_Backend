@@ -59,7 +59,7 @@ class Lesson extends Sequelize.Model {
         });
     }
 
-    static associations(db) {
+    static associate(db) {
         db.Lesson.hasMany(db.Schedule, {
             foreignKey: 'l_id',
             sourceKey: 'l_id',
@@ -73,6 +73,6 @@ class Lesson extends Sequelize.Model {
             onDelete: 'RESTRICT',
         });
     }
-};    
+}
 
 module.exports = Lesson;

@@ -7,8 +7,9 @@ const {
     renderTeacherpage,
     renderTeacherResults,
     renderStudentResults,
-    renderMain
-} = require('../controllers/page');
+    renderMain,
+    createLesson
+} = require('../controllers/d_page');
 
 const router = express.Router();
 
@@ -35,6 +36,8 @@ router.get('/myresults', (req, res, next) => {
         res.status(403).send('접근 권한이 없습니다');
     }
 });
+
+router.post('/create', createLesson);
 
 router.get('/', renderMain);
 
