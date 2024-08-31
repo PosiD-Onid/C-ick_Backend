@@ -58,7 +58,15 @@ exports.readLesson = async (req, res, next) => {
 
 exports.updateLesson = async (req, res, next) => {
     const { id } = req.params;
-    const { l_title, l_content, l_year, l_semester, l_grade, l_class, l_place } = req.body;
+    const {
+        l_title,
+        l_content,
+        l_year,
+        l_semester,
+        l_grade,
+        l_class,
+        l_place
+    } = req.body;
     // const { t_id } = req.user;
     const t_id = '1';
 
@@ -104,7 +112,7 @@ exports.createPerformance = async (req, res, next) => {
         l_id
     } = req.body;
     // const { t_id } = req.user;
-    const t_id = "1";
+    const t_id = '1';
 
     try {
         const lesson = await db.Lesson.findOne({ where: { l_id, t_id } });
@@ -130,12 +138,9 @@ exports.createPerformance = async (req, res, next) => {
     }
 };
 
-exports.getPerformances = async (req, res, next) => {
+exports.readPerformances = async (req, res, next) => {
     try {
-        const performances = await db.Performance.findAll({
-            include: [{ model: db.Lesson, attributes: ['l_title'] }],
-        });
-
+        const performances = await db.Performance.findAll();
         res.status(200).json(performances);
     } catch (error) {
         console.error(error);
@@ -143,13 +148,13 @@ exports.getPerformances = async (req, res, next) => {
     }
 };
 
-exports.getPerformance = async (req, res, next) => {
+exports.readPerformance = async (req, res, next) => {
     const { id } = req.params;
 
     try {
         const performance = await db.Performance.findOne({
             where: { p_id: id },
-            include: [{ model: db.Lesson, attributes: ['l_title'] }],
+            // include: [{ model: db.Lesson, attributes: ['l_title'] }],
         });
 
         if (!performance) {
@@ -165,24 +170,33 @@ exports.getPerformance = async (req, res, next) => {
 
 exports.updatePerformance = async (req, res, next) => {
     const { id } = req.params;
-    const { p_title, p_type, p_content, p_criteria, p_startdate, p_enddate } = req.body;
+    const {
+        p_title,
+        p_type,
+        p_content,
+        p_criteria,
+        p_startdate,
+        p_enddate
+    } = req.body;
     // const { t_id } = req.user;
-    const t_id = "1";
+    const t_id = '2';
 
     try {
-        const performance = await db.Performance.findOne({
-            where: { p_id: id },
-            include: [{ model: db.Lesson }],
-        });
+        const performance = await db.Performance.findOne({ where: { p_id: id } });
 
         if (!performance) {
             return res.status(404).json({ message: '수행평가를 찾을 수 없습니다.' });
         }
 
-        if (performance.Lesson.t_id !== t_id) {
-            return res.status(403).json({ message: '이 수행평가를 수정할 권한이 없습니다.' });
+        const lesson = await db.Lesson.findOne({ where: { l_id: performance.l_id } });
+
+        if (!lesson) {
+            return res.status(404).json({ message: '관련된 수업을 찾을 수 없습니다.' });
         }
 
+        if (lesson.t_id !== t_id) {
+            return res.status(403).json({ message: '이 수행평가를 수정할 권한이 없습니다.' });
+        }
         await performance.update({
             p_title,
             p_type,

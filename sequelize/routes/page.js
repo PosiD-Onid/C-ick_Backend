@@ -13,8 +13,8 @@ const {
     readLesson,
     updateLesson,
     createPerformance,
-    getPerformances,
-    getPerformance,
+    readPerformances,
+    readPerformance,
     updatePerformance,
 } = require('../controllers/page');
 
@@ -45,22 +45,22 @@ router.get('/myresults', (req, res, next) => {
 });
 
 // Lesson
-router.post('/create', /* isLoggedIn, isTeachers */ createLesson);
+router.post('/lesson/create', /* isLoggedIn, isTeachers */ createLesson);
 
-router.get('/read', /* isLoggedIn, */ readLessons);
+router.get('/lesson/read', /* isLoggedIn, */ readLessons);
 
-router.get('/read/:id', /* isLoggedIn, */ readLesson);
+router.get('/lesson/read/:id', /* isLoggedIn, */ readLesson);
 
-router.put('/update/:id', /* isLoggedIn, isTeachers */ updateLesson);
+router.put('/lesson/update/:id', /* isLoggedIn, isTeachers */ updateLesson);
 
 // Performance
-router.post('/create', /* isLoggedIn, isTachers */ createPerformance);
+router.post('/performance/create', /* isLoggedIn, isTachers */ createPerformance);
 
-router.get('/read', /* isLoggedIn, */ getPerformances);
+router.get('/performance/read', /* isLoggedIn, */ readPerformances);
 
-router.get('/read/:id', /* isLoggedIn, */ getPerformance);
+router.get('/performance/read/:id', /* isLoggedIn, */ readPerformance);
 
-router.put('/update/:id', /* isLoggedIn, isTachers, */ updatePerformance);
+router.put('/performance/update/:id', /* isLoggedIn, isTachers, */ updatePerformance);
 
 router.get('/', renderMain);
 

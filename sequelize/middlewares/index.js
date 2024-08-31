@@ -15,9 +15,9 @@ exports.isNotLoggedIn = (req, res, next) => {
     }
 };
 
-// exports.isTeacher = (req, res, next) => {
-//     if (req.user && req.user.t_id) {
-//       return next();
-//     }
-//     return res.status(403).send('선생님만 접근 가능합니다.');
-//   };
+exports.isTeacher = (req, res, next) => {
+    if (req.user && req.user.t_id) {
+      return next();
+    }
+    return res.status(403).send('선생님만 접근 가능합니다.');
+  };
