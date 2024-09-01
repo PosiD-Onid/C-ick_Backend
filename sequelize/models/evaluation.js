@@ -3,6 +3,12 @@ const Sequelize = require('sequelize');
 class Evaluation extends Sequelize.Model {
     static initiate(sequelize) {
         Evaluation.init({
+            e_id: {
+                type: Sequelize.INTEGER,
+                allowNull: false,
+                primaryKey: true,
+                autoIncrement: true,
+            },
             e_score: {
                 type: Sequelize.INTEGER,
                 allowNull: true,
@@ -10,10 +16,12 @@ class Evaluation extends Sequelize.Model {
                     min: 0,
                     max: 100,
                 },
+                defaultValue: 0,
             },
             e_check: {
                 type: Sequelize.BOOLEAN,
                 allowNull: false,
+                defaultValue: false,
             },
             e_checkdate: {
                 type: Sequelize.DATE,
@@ -22,10 +30,10 @@ class Evaluation extends Sequelize.Model {
             s_classof: {
                 type: Sequelize.STRING(4),
                 allowNull: false,
-                primaryKey: true,
+                // primaryKey: true,
                 references: {
                     model: 'students',
-                    key: 's_id',
+                    key: 's_classof',
                 },
                 onUpdate: 'CASCADE',
                 onDelete: 'RESTRICT',
@@ -53,7 +61,7 @@ class Evaluation extends Sequelize.Model {
     }
 
     static associations(db) {
-        db.Evaluation.belongsTo(db.Student, { foreignKey: 's_id' });
+        db.Evaluation.belongsTo(db.Student, { foreignKey: 's_classof' });
         db.Evaluation.belongsTo(db.Performance, { foreignKey: 'p_id' });
     }
 }

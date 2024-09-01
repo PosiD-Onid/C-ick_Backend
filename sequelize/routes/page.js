@@ -1,12 +1,10 @@
 const express = require('express');
-const { isLoggedIn, isNotLoggedIn } = require('../middlewares');
+const { isLoggedIn, isNotLoggedIn, isTeacher, isStudent } = require('../middlewares');
 const {
     renderProfile,
     renderSignup,
     renderSignin,
     renderTeacherpage,
-    renderTeacherResults,
-    renderStudentResults,
     renderMain,
     createLesson,
     readLessons,
@@ -16,6 +14,11 @@ const {
     readPerformances,
     readPerformance,
     updatePerformance,
+    createEvaluation,
+    readAllEvaluationsForTeacher,
+    readAllEvaluationsForStudent,
+    updateEvaluationScore,
+    updateEvaluationCheck,
 } = require('../controllers/page');
 
 const router = express.Router();
@@ -29,16 +32,6 @@ router.get('/signin', renderSignin);
 router.get('/teacherpage', (req, res, next) => {
     if (req.user && req.user.role === 'teacher') {
         return renderTeacherpage(req, res, next);
-    } else {
-        res.status(403).send('접근 권한이 없습니다');
-    }
-});
-
-router.get('/myresults', (req, res, next) => {
-    if (req.user && req.user.role === 'teacher') {
-        return renderTeacherResults(req, res, next);
-    } else if (req.user && req.user.role === 'student') {
-        return renderStudentResults(req, res, next);
     } else {
         res.status(403).send('접근 권한이 없습니다');
     }
@@ -61,6 +54,17 @@ router.get('/performance/read', /* isLoggedIn, */ readPerformances);
 router.get('/performance/read/:id', /* isLoggedIn, */ readPerformance);
 
 router.put('/performance/update/:id', /* isLoggedIn, isTachers, */ updatePerformance);
+
+// Evaluation
+router.post('/evaluation/create', /* isLoggedIn, isTeacher, */ createEvaluation);
+
+router.get('/evaluation/teacher/read', /* isLoggedIn, isTeacher, */ readAllEvaluationsForTeacher);
+
+router.get('/evaluation/student/read', /* isLoggedIn, isStudent, */ readAllEvaluationsForStudent);
+
+router.put('/evaluation/teacher/update/:e_id', /* isLoggedIn, isTeacher, */ updateEvaluationScore);
+
+router.put('/evaluation/student/update/:e_id', /* isLoggedIn, isStudent, */ updateEvaluationCheck);
 
 router.get('/', renderMain);
 

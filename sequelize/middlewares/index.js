@@ -20,4 +20,11 @@ exports.isTeacher = (req, res, next) => {
       return next();
     }
     return res.status(403).send('선생님만 접근 가능합니다.');
-  };
+};
+
+exports.isStudent = (req, res, next) => {
+    if (req.user && req.user.s_id) {
+        return next();
+    }
+    return res.status(403).send('학생만 접근 가능합니다.');
+};
