@@ -6,18 +6,24 @@ const session = require('express-session');
 const nunjucks = require('nunjucks');
 const dotenv = require('dotenv');
 const passport = require('passport');
+const cors = require('cors')
 
 dotenv.config();
+const apiRouter = require('./routes/api')
 const pageRouter = require('./routes/page');
 const authRouter = require('./routes/auth');
-// const lessonRouter = require('./routes/l_page');
-// const performanceRouter = require('./routes/p_page');
 const { sequelize } = require('./models');
 const passportConfig = require('./passport');
 
 const app = express();
+
+// app.use(cors({
+//     origin: req.get('origin'),
+//     credentials: 'include',
+// }))
+
 passportConfig();
-app.set('port', process.env.PORT || 8001);
+app.set('port', process.env.PORT || 7221);
 app.set('view engine', 'html');
 nunjucks.configure('views', {
     express: app,
@@ -48,9 +54,17 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use('/api', apiRouter)
 app.use('/', pageRouter);
 app.use('/auth', authRouter);
 
+app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    next();
+  })
+  
 app.use((req, res, next) => {
     const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
     error.status = 404;

@@ -28,9 +28,8 @@ class Evaluation extends Sequelize.Model {
                 allowNull: false,
             },
             s_classof: {
-                type: Sequelize.STRING(4),
+                type: Sequelize.INTEGER(4),
                 allowNull: false,
-                // primaryKey: true,
                 references: {
                     model: 'students',
                     key: 's_classof',

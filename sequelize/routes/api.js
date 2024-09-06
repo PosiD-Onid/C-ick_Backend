@@ -1,5 +1,8 @@
 const express = require('express');
-const { isLoggedIn, isNotLoggedIn, isTeacher, isStudent } = require('../middlewares');
+const passport = require('passport');
+
+const { isLoggedIn, isNotLoggedIn, isTeacher, isStudent, corsDomain } = require('../middlewares');
+const { s_signup, t_signup, signin, signout } = require('../controllers/auth');
 const {
     renderProfile,
     renderStudentsMain,
@@ -22,6 +25,22 @@ const {
 } = require('../controllers/page');
 
 const router = express.Router();
+
+// router.use(cors({
+//     credentials: true,
+// }))
+
+// POST /auth/s_signup (학생 가입)
+router.post('/auth/s_signup', isNotLoggedIn, s_signup);
+
+// POST /auth/t_signup (교사 가입)
+router.post('/auth/t_signup', isNotLoggedIn, t_signup);
+
+// POST /auth/signin (로그인)
+router.post('/auth/signin', isNotLoggedIn, signin);
+
+// POST /auth/signout (로그아웃)
+router.post('/auth/signout', isLoggedIn, signout);
 
 router.get('/profile', isLoggedIn, renderProfile);
 

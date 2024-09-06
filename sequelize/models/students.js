@@ -4,11 +4,10 @@ class Students extends Sequelize.Model {
     static initiate(sequelize) {
         Students.init({
             s_classof: {
-                type: Sequelize.STRING(4),
+                type: Sequelize.INTEGER(4),
+                autoIncrement: true,
                 allowNull: false,
-                unique: true,
                 primaryKey: true,
-                defaultValue: '0000'
             },
             s_id: {
                 type: Sequelize.STRING(10),
@@ -22,6 +21,9 @@ class Students extends Sequelize.Model {
             s_pass: {
                 type: Sequelize.STRING(255),
                 allowNull: false,
+                validate: {
+                    len: [8, Infinity],
+                },
             },
             s_year: {
                 type: Sequelize.STRING(4),

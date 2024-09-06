@@ -349,38 +349,21 @@ exports.updateEvaluationCheck = async (req, res, next) => {
 };
 
 exports.renderProfile = (req, res) => {
-    res.render('profile');
-};
-
-exports.renderSignup = (req, res) => {
-    res.render('signup');
-};
-
-exports.renderSignin = (req, res) => {
-    res.render('signin');
+    res.status(200).send("프로필");
 };
 
 exports.renderTeacherpage = (req, res) => {
-    res.render('teacherpage');
+    res.status(200).send("선생님 페이지");
 };
 
-exports.renderMain = (req, res, next) => {
-    const twits = [];
-    res.send(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>C!ick</title>
-        </head>
-        <body>
-            <h1>Welcome to C!ick</h1>
-            <p>This is the main page.</p>
-            <ul>
-                ${twits.map(twit => `<li>${twit}</li>`).join('')}
-            </ul>
-        </body>
-        </html>
-    `);
+exports.renderOnboarding = (req, res) => {
+    res.status(200).send("onboarding(시작화면)");
+}
+
+exports.renderStudentsMain = (req, res) => {
+    res.status(200).send("학생 메인페이지");
+};
+
+exports.renderTeachersMain = (req, res) => {
+    res.status(200).send("선생님 메인페이지");
 };

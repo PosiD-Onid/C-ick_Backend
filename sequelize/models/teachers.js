@@ -12,6 +12,9 @@ class Teachers extends Sequelize.Model {
             t_pass: {
                 type: Sequelize.STRING(255),
                 allowNull: false,
+                validate: {
+                    len: [8, Infinity],
+                },
             },
             t_name: {
                 type: Sequelize.STRING(12),
