@@ -59,7 +59,7 @@ router.post('/lesson/create', /* isLoggedIn, isTeachers */ createLesson);
 
 router.get('/lesson/read', /* isLoggedIn, */ readLessons);
 
-router.get('/lesson/read/:id', /* isLoggedIn, */ readLesson);
+router.get('/lesson/read/teacher=:teacher', /* isLoggedIn, isTeachers */ readLesson);
 
 router.put('/lesson/update/:id', /* isLoggedIn, isTeachers */ updateLesson);
 

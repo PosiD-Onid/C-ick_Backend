@@ -4,13 +4,15 @@ const Students = require('../models/students');
 const Teachers = require('../models/teachers');
 
 exports.s_signup = async (req, res, next) => {
+    console.log(req.body)
     const { s_id, s_name, s_pass } = req.body;
     try {
         if (s_pass.length < 8) {
             return res.status(400).send('비밀번호는 최소 8자 이상이어야 합니다.');
         }
         const exStudents = await Students.findOne({ where: { s_id } });
-        if (exStudents) {
+        const exTeacher = await Teachers.findOne({ where: { t_id: s_id } });
+        if (exStudents || exTeacher) {
             return res.status(400).send('이미 존재하는 아이디입니다.');
         }
         const hash = await bcrypt.hash(s_pass, 8);
@@ -27,13 +29,15 @@ exports.s_signup = async (req, res, next) => {
 }
 
 exports.t_signup = async (req, res, next) => {
+    console.log(req.body)
     const { t_id, t_name, t_subject, t_pass } = req.body;
     try {
         if (t_pass.length < 8) {
             return res.status(400).send('비밀번호는 최소 8자 이상이어야 합니다.');
         }
         const exTeachers = await Teachers.findOne({ where: { t_id } });
-        if (exTeachers) {
+        const exStudent = await Students.findOne({ where: { s_id: t_id } });
+        if (exTeachers || exStudent) {
             return res.status(400).send('이미 존재하는 아이디입니다.');
         }
         const hash = await bcrypt.hash(t_pass, 8);
@@ -57,7 +61,7 @@ exports.signin = (req, res, next) => {
             return next(authError);
         }
         if (!user) {
-            return res.status(401).send(info.message);
+            return res.status(401).json({ message: info.message });
         }
         return req.logIn(user, (signinError) => {
             if (signinError) {
@@ -67,15 +71,9 @@ exports.signin = (req, res, next) => {
 
             const userType = user.s_id ? 'student' : 'teacher';
 
-            if (userType === 'student') {
-                return res.status(200).send('사용자 유형: student');
-            } else if (userType === 'teacher') {
-                return res.status(200).send('사용자 유형: teacher');
-            } else {
-                return res.status(400).send('가입되지 않은 사용자입니다.');
-            }
-        });
-    })(req, res, next);
+            return res.status(200).json({ userType });
+    });
+  })(req, res, next);
 };
 
 exports.signout = (req, res) => {

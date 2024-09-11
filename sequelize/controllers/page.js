@@ -12,7 +12,7 @@ exports.createLesson = async (req, res, next) => {
             l_place
         } = req.body;
         
-        const t_id = '1';
+        const t_id = 'www';
 
         const lesson = await db.Lesson.create({
             l_title,
@@ -43,9 +43,9 @@ exports.readLessons = async (req, res, next) => {
 };
 
 exports.readLesson = async (req, res, next) => {
-    const { id } = req.params;
+    const { teacher } = req.params;
     try {
-        const lesson = await db.Lesson.findOne({ where: { l_id: id } });
+        const lesson = await db.Lesson.findOne({ where: { t_id: teacher } });
         if (!lesson) {
             return res.status(404).json({ message: '수업을 찾을 수 없습니다.' });
         }
@@ -68,7 +68,7 @@ exports.updateLesson = async (req, res, next) => {
         l_place
     } = req.body;
     // const { t_id } = req.user;
-    const t_id = '1';
+    const t_id = 'qwe';
 
     try {
         const lesson = await db.Lesson.findOne({ where: { l_id: id } });
@@ -112,7 +112,7 @@ exports.createPerformance = async (req, res, next) => {
         l_id
     } = req.body;
     // const { t_id } = req.user;
-    const t_id = '1';
+    const t_id = 'qwe';
 
     try {
         const lesson = await db.Lesson.findOne({ where: { l_id, t_id } });
@@ -179,7 +179,7 @@ exports.updatePerformance = async (req, res, next) => {
         p_enddate
     } = req.body;
     // const { t_id } = req.user;
-    const t_id = '2';
+    const t_id = 'www';
 
     try {
         const performance = await db.Performance.findOne({ where: { p_id: id } });
