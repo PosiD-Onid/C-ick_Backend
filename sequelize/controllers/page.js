@@ -12,7 +12,7 @@ exports.createLesson = async (req, res, next) => {
             l_place
         } = req.body;
         
-        const t_id = 'www';
+        const t_id = 'qwe';
 
         const lesson = await db.Lesson.create({
             l_title,
@@ -33,8 +33,9 @@ exports.createLesson = async (req, res, next) => {
 };
 
 exports.readLessons = async (req, res, next) => {
+    const { teacher } = req.params;
     try {
-        const lessons = await db.Lesson.findAll();
+        const lessons = await db.Lesson.findAll({ where: { t_id: teacher } });
         res.status(200).json(lessons);
     } catch (error) {
         console.error(error);
@@ -43,9 +44,9 @@ exports.readLessons = async (req, res, next) => {
 };
 
 exports.readLesson = async (req, res, next) => {
-    const { teacher } = req.params;
+    const { teacher, id } = req.params;
     try {
-        const lesson = await db.Lesson.findOne({ where: { t_id: teacher } });
+        const lesson = await db.Lesson.findOne({ where: { t_id: teacher, l_id: id } });
         if (!lesson) {
             return res.status(404).json({ message: '수업을 찾을 수 없습니다.' });
         }
@@ -102,30 +103,36 @@ exports.updateLesson = async (req, res, next) => {
 };
 
 exports.createPerformance = async (req, res, next) => {
+    //console.log(req.body);
+    
     const {
         p_title,
-        p_type,
+        // p_type,
+        p_place,
         p_content,
-        p_criteria,
+        // p_criteria,
         p_startdate,
         p_enddate,
-        l_id
-    } = req.body;
+    } = req.body.params;
     // const { t_id } = req.user;
     const t_id = 'qwe';
+    const l_id = 3
+
+    //console.log(p_title)
 
     try {
         const lesson = await db.Lesson.findOne({ where: { l_id, t_id } });
-
+        console.log(lesson)
         if (!lesson) {
             return res.status(403).json({ message: '수업이 존재하지 않거나 권한이 없습니다.' });
         }
     
         const performance = await db.Performance.create({
             p_title,
-            p_type,
+            // p_type,
+            p_place,
             p_content,
-            p_criteria,
+            // p_criteria,
             p_startdate,
             p_enddate,
             l_id,
@@ -139,8 +146,9 @@ exports.createPerformance = async (req, res, next) => {
 };
 
 exports.readPerformances = async (req, res, next) => {
+    const { lesson } = req.params;
     try {
-        const performances = await db.Performance.findAll();
+        const performances = await db.Performance.findAll({ where: { l_id: lesson } });
         res.status(200).json(performances);
     } catch (error) {
         console.error(error);
@@ -149,11 +157,11 @@ exports.readPerformances = async (req, res, next) => {
 };
 
 exports.readPerformance = async (req, res, next) => {
-    const { id } = req.params;
+    const { lesson, id } = req.params;
 
     try {
         const performance = await db.Performance.findOne({
-            where: { p_id: id },
+            where: { l_id: lesson, p_id: id },
             // include: [{ model: db.Lesson, attributes: ['l_title'] }],
         });
 
@@ -194,9 +202,9 @@ exports.updatePerformance = async (req, res, next) => {
             return res.status(404).json({ message: '관련된 수업을 찾을 수 없습니다.' });
         }
 
-        if (lesson.t_id !== t_id) {
-            return res.status(403).json({ message: '이 수행평가를 수정할 권한이 없습니다.' });
-        }
+        // if (lesson.t_id !== t_id) {
+        //     return res.status(403).json({ message: '이 수행평가를 수정할 권한이 없습니다.' });
+        // }
         await performance.update({
             p_title,
             p_type,

@@ -57,20 +57,20 @@ router.get('/teacherpage', (req, res, next) => {
 // Lesson
 router.post('/lesson/create', /* isLoggedIn, isTeachers */ createLesson);
 
-router.get('/lesson/read', /* isLoggedIn, */ readLessons);
+router.get('/lesson/teacher=:teacher', /* isLoggedIn, */ readLessons);
 
-router.get('/lesson/read/teacher=:teacher', /* isLoggedIn, isTeachers */ readLesson);
+router.get('/lesson/teacher=:teacher/:id', /* isLoggedIn, isTeachers */ readLesson);
 
-router.put('/lesson/update/:id', /* isLoggedIn, isTeachers */ updateLesson);
+router.put('/lesson/teacher=:teacher/update/:id', /* isLoggedIn, isTeachers */ updateLesson);
 
 // Performance
 router.post('/performance/create', /* isLoggedIn, isTachers */ createPerformance);
 
-router.get('/performance/read', /* isLoggedIn, */ readPerformances);
+router.get('/performance/lesson=:lesson', /* isLoggedIn, */ readPerformances);
 
-router.get('/performance/read/:id', /* isLoggedIn, */ readPerformance);
+router.get('/performance/lesson=:lesson/:id', /* isLoggedIn, */ readPerformance);
 
-router.put('/performance/update/:id', /* isLoggedIn, isTachers, */ updatePerformance);
+router.put('/performance/lesson=:lesson/update/:id', /* isLoggedIn, isTachers, */ updatePerformance);
 
 // Evaluation
 router.post('/evaluation/create', /* isLoggedIn, isTeacher, */ createEvaluation);

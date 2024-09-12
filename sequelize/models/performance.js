@@ -13,18 +13,22 @@ class Performance extends Sequelize.Model {
                 type: Sequelize.STRING(30),
                 allowNull: false,
             },
-            p_type: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
+            // p_type: {
+            //     type: Sequelize.INTEGER,
+            //     allowNull: false,
+            // },
+            p_place: {
+                type: Sequelize.STRING(10),
+                allowNull: true,
             },
             p_content: {
                 type: Sequelize.TEXT('tiny'),
                 allowNull: false,
             },
-            p_criteria: {
-                type: Sequelize.TEXT('tiny'),
-                allowNull: false,
-            },
+            // p_criteria: {
+            //     type: Sequelize.TEXT('tiny'),
+            //     allowNull: false,
+            // },
             p_startdate: {
                 type: Sequelize.DATE,
                 allowNull: false,
