@@ -72,10 +72,11 @@ router.get('/performance/lesson=:lesson/:id', /* isLoggedIn, */ readPerformance)
 
 router.put('/performance/lesson=:lesson/update/:id', /* isLoggedIn, isTachers, */ updatePerformance);
 
+
 // Evaluation
 router.post('/evaluation/create', /* isLoggedIn, isTeacher, */ createEvaluation);
 
-router.get('/evaluation/teacher/read', /* isLoggedIn, isTeacher, */ readAllEvaluationsForTeacher);
+router.get('/evaluation/performance=:performance/s_classof=:s_classof', /* isLoggedIn, isTeacher, */ readAllEvaluationsForTeacher);
 
 router.get('/evaluation/student/read', /* isLoggedIn, isStudent, */ readAllEvaluationsForStudent);
 

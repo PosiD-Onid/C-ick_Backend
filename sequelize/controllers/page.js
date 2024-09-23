@@ -1,3 +1,4 @@
+const Sequelize = require('sequelize');
 const db = require('../models');
 
 exports.createLesson = async (req, res, next) => {
@@ -33,7 +34,9 @@ exports.createLesson = async (req, res, next) => {
 };
 
 exports.readLessons = async (req, res, next) => {
-    const { teacher } = req.params;
+    // console.log(req.body);
+    // const { teacher } = req.params;
+    const teacher = 'qwe';
     try {
         const lessons = await db.Lesson.findAll({ where: { t_id: teacher } });
         res.status(200).json(lessons);
@@ -103,7 +106,8 @@ exports.updateLesson = async (req, res, next) => {
 };
 
 exports.createPerformance = async (req, res, next) => {
-    //console.log(req.body);
+    // const { l_id } = req.params;
+    console.log(req.body);
     
     const {
         p_title,
@@ -146,9 +150,14 @@ exports.createPerformance = async (req, res, next) => {
 };
 
 exports.readPerformances = async (req, res, next) => {
+    console.log(req.body);
     const { lesson } = req.params;
+    // const lesson = 3;
     try {
-        const performances = await db.Performance.findAll({ where: { l_id: lesson } });
+        const performances = await db.Performance.findAll({
+            where: { l_id: lesson },
+            order: [['p_startdate', 'DESC']]
+        });
         res.status(200).json(performances);
     } catch (error) {
         console.error(error);
@@ -177,6 +186,7 @@ exports.readPerformance = async (req, res, next) => {
 };
 
 exports.updatePerformance = async (req, res, next) => {
+    // console.log(req.body);
     const { id } = req.params;
     const {
         p_title,
@@ -184,13 +194,14 @@ exports.updatePerformance = async (req, res, next) => {
         p_content,
         p_criteria,
         p_startdate,
-        p_enddate
+        p_enddate,
+        p_id,
     } = req.body;
     // const { t_id } = req.user;
     const t_id = 'www';
 
     try {
-        const performance = await db.Performance.findOne({ where: { p_id: id } });
+        const performance = await db.Performance.findOne({ where: { p_id: p_id } });
 
         if (!performance) {
             return res.status(404).json({ message: '수행평가를 찾을 수 없습니다.' });
@@ -205,14 +216,26 @@ exports.updatePerformance = async (req, res, next) => {
         // if (lesson.t_id !== t_id) {
         //     return res.status(403).json({ message: '이 수행평가를 수정할 권한이 없습니다.' });
         // }
-        await performance.update({
-            p_title,
-            p_type,
-            p_content,
-            p_criteria,
-            p_startdate,
-            p_enddate,
-        });
+
+        // 여기서 출력이 안됨
+        console.log(req.body)
+        const result = await db.Performance.update(
+            {
+                p_title,
+                p_type,
+                p_content,
+                p_criteria,
+                p_startdate,
+                p_enddate,
+            },
+            {
+                where: { p_id },
+            }
+        );
+
+         if (result[0] === 0) {
+            return res.status(404).json({ message: '수행평가 업데이트 실패 또는 데이터가 없습니다.' });
+        }
 
         res.status(200).json({ message: '수행평가가 성공적으로 업데이트되었습니다.', performance });
     } catch (error) {
@@ -226,25 +249,54 @@ exports.createEvaluation = async (req, res, next) => {
         const {
             e_score,
             e_check,
-            e_checkdate,
             s_classof,
             p_id
         } = req.body;
 
         try {
-            const performance = await db.Performance.findOne({ where: { p_id } });
+            const classofNumber = parseInt(s_classof, 10); 
 
+            if (isNaN(classofNumber)) {
+                return res.status(400).json({ message: 's_classof 값이 유효하지 않습니다.' });
+            }
+    
+            // p_id로 수행평가를 찾음
+            const performance = await db.Performance.findOne({ where: { p_id } });
+    
             if (!performance) {
                 return res.status(404).json({ message: '수행평가를 찾을 수 없습니다.' });
             }
-
-            const evaluation = await db.Evaluation.create({
-                e_score,
-                e_check,
-                e_checkdate,
-                s_classof,
-                p_id,
+    
+            // 앞 두 자리 확인을 위해 classofNumber를 문자열로 변환
+            const classGroupPrefix = classofNumber.toString().slice(0, 2);
+    
+            // 해당하는 학급의 학생들 조회
+            const students = await db.Students.findAll({
+                where: {
+                    s_classof: {
+                        [Sequelize.Op.like]: `${classGroupPrefix}%`
+                    }
+                }
             });
+    
+            if (students.length === 0) {
+                return res.status(404).json({ message: '해당 학급에 속하는 학생이 없습니다.' });
+            }
+    
+            // 해당 학생들에 대해 평가 생성
+            const evaluation = await Promise.all(
+                students.map(student =>
+                    db.Evaluation.create({
+                        e_score,
+                        e_check,
+                        s_classof: student.s_classof,
+                        s_name: student.s_name, // 학생의 s_name 추가
+                        p_id,
+                        p_title: performance.p_title // 수행평가의 p_title 추가
+                    })
+                )
+            );
+    
 
             res.status(201).json({ message: '수행평가점수가 성공적으로 생성되었습니다.', evaluation });
         } catch (error) {
@@ -258,28 +310,35 @@ exports.createEvaluation = async (req, res, next) => {
 
 // 모든 Evaluation 조회 (선생님용)
 exports.readAllEvaluationsForTeacher = async (req, res, next) => {
-    // if (req.user && req.user.role === 'teacher') {
-        const { p_id } = req.query;
+    const { performance, s_classof } = req.params;
 
-        try {
-            const where = p_id ? { p_id } : {};
-            const evaluations = await db.Evaluation.findAll({
-                where,
-                // include: [
-                //     { model: db.Student, attributes: ['s_name'] },
-                //     { model: db.Performance, attributes: ['p_title'] },
-                // ],
-            });
+    try {
+        const classofNumber = parseInt(s_classof, 10); 
 
-            res.status(200).json(evaluations);
-        } catch (error) {
-            console.error(error);
-            next(error);
+        if (isNaN(classofNumber)) {
+            return res.status(400).json({ message: 's_classof 값이 유효하지 않습니다.' });
         }
-    // } else {
-    //     res.status(403).send('접근 권한이 없습니다.');
-    // }
+
+        // s_classof의 앞부분이 특정 숫자인 학생들의 평가를 조회
+        const classGroupPrefix = classofNumber.toString().slice(0, 2); // 앞 두 자리 가져오기
+
+        const evaluations = await db.Evaluation.findAll({
+            where: {
+                s_classof: {
+                    [Sequelize.Op.like]: `${classGroupPrefix}%` // 앞 두 자리로 필터링
+                },
+                p_id: performance
+            },
+            // include: [{ model: db.Student, attributes: ['s_name'] }] // 학생 이름을 포함
+        });
+
+        res.status(200).json(evaluations);
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
 };
+
 
 // 학생의 모든 Evaluation 조회 (학생용)
 exports.readAllEvaluationsForStudent = async (req, res, next) => {
@@ -335,7 +394,7 @@ exports.updateEvaluationScore = async (req, res, next) => {
 exports.updateEvaluationCheck = async (req, res, next) => {
     // if (req.user && req.user.role === 'student') {
         const { e_id } = req.params;
-        const { e_check, e_checkdate } = req.body;
+        const { e_check } = req.body;
 
         try {
             const evaluation = await db.Evaluation.findOne({ where: { e_id } });
@@ -344,7 +403,7 @@ exports.updateEvaluationCheck = async (req, res, next) => {
                 return res.status(404).json({ message: '수행평가점수를 찾을 수 없습니다.' });
             }
 
-            await evaluation.update({ e_check, e_checkdate });
+            await evaluation.update({ e_check });
 
             res.status(200).json({ message: '수행평가점수 확인 상태가 성공적으로 업데이트되었습니다.', evaluation });
         } catch (error) {

@@ -35,7 +35,7 @@ class Performance extends Sequelize.Model {
             },
             p_enddate: {
                 type: Sequelize.DATE,
-                allowNull: false,
+                allowNull: true,
             },
             l_id: {
                 type: Sequelize.INTEGER,

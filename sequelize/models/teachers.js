@@ -28,7 +28,7 @@ class Teachers extends Sequelize.Model {
             sequelize,
             timestamps: true,
             underscored: false,
-            modelName: 'Teacher',
+            modelName: 'Teachers',
             tableName: 'teachers',
             paranoid: false,
             charset: 'utf8',
