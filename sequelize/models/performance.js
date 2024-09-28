@@ -66,12 +66,12 @@ class Performance extends Sequelize.Model {
             onUpdate: 'CASCADE',
             onDelete: 'RESTRICT',
         });
-        db.Performance.hasMany(db.Alarm, {
-            foreignKey: 'p_id',
-            sourceKey: 'p_id',
-            onUpdate: 'CASCADE',
-            onDelete: 'RESTRICT',
-        });
+        // db.Performance.hasMany(db.Alarm, {
+        //     foreignKey: 'p_id',
+        //     sourceKey: 'p_id',
+        //     onUpdate: 'CASCADE',
+        //     onDelete: 'RESTRICT',
+        // });
     }
 }
 

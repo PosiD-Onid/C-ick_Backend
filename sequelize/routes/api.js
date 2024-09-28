@@ -55,34 +55,34 @@ router.get('/teacherpage', (req, res, next) => {
 });
 
 // Lesson
-router.post('/lesson/create', /* isLoggedIn, isTeachers */ createLesson);
+router.post('/lesson/create', isLoggedIn, isTeacher, createLesson);
 
-router.get('/lesson/teacher=:teacher', /* isLoggedIn, */ readLessons);
+router.get('/lesson/teacher=:teacher', isLoggedIn, readLessons);
 
-router.get('/lesson/teacher=:teacher/:id', /* isLoggedIn, isTeachers */ readLesson);
+router.get('/lesson/teacher=:teacher/:id', isLoggedIn, isTeacher, readLesson);
 
-router.put('/lesson/teacher=:teacher/update/:id', /* isLoggedIn, isTeachers */ updateLesson);
+router.put('/lesson/teacher=:teacher/update/:id', isLoggedIn, isTeacher, updateLesson);
 
 // Performance
-router.post('/performance/create', /* isLoggedIn, isTachers */ createPerformance);
+router.post('/performance/create', isLoggedIn, isTeacher, createPerformance);
 
-router.get('/performance/lesson=:lesson', /* isLoggedIn, */ readPerformances);
+router.get('/performance/lesson=:lesson', isLoggedIn, readPerformances);
 
-router.get('/performance/lesson=:lesson/:id', /* isLoggedIn, */ readPerformance);
+router.get('/performance/lesson=:lesson/:id', isLoggedIn, readPerformance);
 
-router.put('/performance/lesson=:lesson/update/:id', /* isLoggedIn, isTachers, */ updatePerformance);
+router.put('/performance/lesson=:lesson/update/:id', isLoggedIn, isTeacher, updatePerformance);
 
 
 // Evaluation
-router.post('/evaluation/create', /* isLoggedIn, isTeacher, */ createEvaluation);
+router.post('/evaluation/create', isLoggedIn, isTeacher, createEvaluation);
 
-router.get('/evaluation/performance=:performance/s_classof=:s_classof', /* isLoggedIn, isTeacher, */ readAllEvaluationsForTeacher);
+router.get('/evaluation/performance=:performance/s_classof=:s_classof', isLoggedIn, isTeacher, readAllEvaluationsForTeacher);
 
-router.get('/evaluation/student/read', /* isLoggedIn, isStudent, */ readAllEvaluationsForStudent);
+router.get('/evaluation/s_classof=:s_classof/', isLoggedIn, isStudent, readAllEvaluationsForStudent);
 
-router.put('/evaluation/teacher/update/:e_id', /* isLoggedIn, isTeacher, */ updateEvaluationScore);
+router.put('/evaluation/teacher/performance=:performance/s_classof=:s_classof/', isLoggedIn, isTeacher, updateEvaluationScore);
 
-router.put('/evaluation/student/update/:e_id', /* isLoggedIn, isStudent, */ updateEvaluationCheck);
+router.put('/evaluation/student/performance=:performance', isLoggedIn, isStudent, updateEvaluationCheck);
 
 // Main
 router.get('/students', renderStudentsMain);

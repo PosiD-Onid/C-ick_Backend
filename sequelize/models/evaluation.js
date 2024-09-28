@@ -3,12 +3,6 @@ const Sequelize = require('sequelize');
 class Evaluation extends Sequelize.Model {
     static initiate(sequelize) {
         Evaluation.init({
-            e_id: {
-                type: Sequelize.INTEGER,
-                allowNull: false,
-                primaryKey: true,
-                autoIncrement: true,
-            },
             e_score: {
                 type: Sequelize.INTEGER,
                 allowNull: true,
@@ -26,6 +20,7 @@ class Evaluation extends Sequelize.Model {
             s_classof: {
                 type: Sequelize.INTEGER(4),
                 allowNull: false,
+                primaryKey: true,
                 references: {
                     model: 'students',
                     key: 's_classof',
@@ -46,6 +41,7 @@ class Evaluation extends Sequelize.Model {
             p_id: {
                 type: Sequelize.INTEGER,
                 allowNull: false,
+                primaryKey: true,
                 references: {
                     model: 'performance',
                     key: 'p_id',

@@ -5,7 +5,7 @@ const Teachers = require('../models/teachers');
 
 module.exports = () => {
     passport.serializeUser((user, done) => {
-        done(null, { id: user.id, role: user.role });
+        done(null, { id: user.s_id || user.t_id, role: user.s_pass ? 'student' : 'teacher' });
     });
 
     passport.deserializeUser(async (obj, done) => {

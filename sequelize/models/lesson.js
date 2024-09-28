@@ -60,12 +60,6 @@ class Lesson extends Sequelize.Model {
     }
 
     static associate(db) {
-        db.Lesson.hasMany(db.Schedule, {
-            foreignKey: 'l_id',
-            sourceKey: 'l_id',
-            onUpdate: 'CASCADE',
-            onDelete: 'RESTRICT',
-        });
         db.Lesson.hasMany(db.Performance, {
             foreignKey: 'l_id',
             sourceKey: 'l_id',

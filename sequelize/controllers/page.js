@@ -12,8 +12,8 @@ exports.createLesson = async (req, res, next) => {
             l_class,
             l_place
         } = req.body;
-        
-        const t_id = 'qwe';
+        const { t_id } = req.user;
+        // const t_id = 'qwe';
 
         const lesson = await db.Lesson.create({
             l_title,
@@ -35,8 +35,8 @@ exports.createLesson = async (req, res, next) => {
 
 exports.readLessons = async (req, res, next) => {
     // console.log(req.body);
-    // const { teacher } = req.params;
-    const teacher = 'qwe';
+    const { teacher } = req.params;
+    // const teacher = 'qwe';
     try {
         const lessons = await db.Lesson.findAll({ where: { t_id: teacher } });
         res.status(200).json(lessons);
@@ -71,8 +71,8 @@ exports.updateLesson = async (req, res, next) => {
         l_class,
         l_place
     } = req.body;
-    // const { t_id } = req.user;
-    const t_id = 'qwe';
+    const { t_id } = req.user;
+    // const t_id = 'qwe';
 
     try {
         const lesson = await db.Lesson.findOne({ where: { l_id: id } });
@@ -106,7 +106,7 @@ exports.updateLesson = async (req, res, next) => {
 };
 
 exports.createPerformance = async (req, res, next) => {
-    // const { l_id } = req.params;
+    const { l_id } = req.params;
     console.log(req.body);
     
     const {
@@ -118,9 +118,9 @@ exports.createPerformance = async (req, res, next) => {
         p_startdate,
         p_enddate,
     } = req.body.params;
-    // const { t_id } = req.user;
-    const t_id = 'qwe';
-    const l_id = 3
+    const { t_id } = req.user;
+    // const t_id = 'qwe';
+    // const l_id = 3
 
     //console.log(p_title)
 

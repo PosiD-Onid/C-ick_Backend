@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt');
 const passport = require('passport');
 const Students = require('../models/students');
 const Teachers = require('../models/teachers');
@@ -15,11 +15,11 @@ exports.s_signup = async (req, res, next) => {
         if (exStudents || exTeacher) {
             return res.status(400).send('이미 존재하는 아이디입니다.');
         }
-        const hash = await bcrypt.hash(s_pass, 8);
+        //const hash = await bcrypt.hash(s_pass, 8);
         await Students.create({
             s_id,
             s_name,
-            s_pass: hash,
+            s_pass//: hash,
         });
         return res.status(200).send('회원가입 성공');
     } catch (error) {
@@ -40,12 +40,12 @@ exports.t_signup = async (req, res, next) => {
         if (exTeachers || exStudent) {
             return res.status(400).send('이미 존재하는 아이디입니다.');
         }
-        const hash = await bcrypt.hash(t_pass, 8);
+        //const hash = await bcrypt.hash(t_pass, 8);
         await Teachers.create({
             t_id,
             t_name,
             t_subject,
-            t_pass: hash,
+            t_pass//: hash,
         });
         return res.status(200).send('회원가입 성공')
     } catch (error) {
@@ -69,7 +69,12 @@ exports.signin = (req, res, next) => {
                 return next(signinError);
             }
 
-            const userType = user.s_id ? 'student' : 'teacher';
+            req.session.userId = user.s_id ? user.s_id : user.t_id;
+            req.session.userRole = user.s_id ? 'student' : 'teacher';
+
+            const userType = req.session.userRole;
+            
+            console.log("세션 정보:", req.session);
 
             return res.status(200).json({ userType });
     });
@@ -78,6 +83,11 @@ exports.signin = (req, res, next) => {
 
 exports.signout = (req, res) => {
     req.logout(() => {
-        res.status(200).send('로그아웃 성공')
+        req.session.destroy((err) => {
+            if (err) {
+                return res.status(500).send('로그아웃 실패');
+            }
+            res.status(200).send('로그아웃 성공');
+        });
     });
 };
