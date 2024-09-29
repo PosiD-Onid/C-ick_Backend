@@ -1,8 +1,8 @@
 const express = require('express');
 const passport = require('passport');
 
-const { isLoggedIn, isNotLoggedIn, isTeacher, isStudent, corsDomain } = require('../middlewares');
-const { s_signup, t_signup, signin, signout } = require('../controllers/auth');
+const { isLoggedIn, isNotLoggedIn, isTeacher, isStudent } = require('../middlewares');
+const { s_signup, t_signup, signin, checkLoginStatus, signout } = require('../controllers/auth');
 const {
     renderProfile,
     renderStudentsMain,
@@ -42,6 +42,8 @@ router.post('/auth/signin', isNotLoggedIn, signin);
 // POST /auth/signout (로그아웃)
 router.post('/auth/signout', isLoggedIn, signout);
 
+router.get('/auth/checkLoginStatus', checkLoginStatus);
+
 router.get('/profile', isLoggedIn, renderProfile);
 
 router.get('/onboarding', isNotLoggedIn, renderOnboarding);
@@ -64,7 +66,7 @@ router.get('/lesson/teacher=:teacher/:id', isLoggedIn, isTeacher, readLesson);
 router.put('/lesson/teacher=:teacher/update/:id', isLoggedIn, isTeacher, updateLesson);
 
 // Performance
-router.post('/performance/create', isLoggedIn, isTeacher, createPerformance);
+router.post('/performance/create',/*  isLoggedIn, isTeacher, */ createPerformance);
 
 router.get('/performance/lesson=:lesson', isLoggedIn, readPerformances);
 

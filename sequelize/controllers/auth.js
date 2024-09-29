@@ -2,6 +2,7 @@
 const passport = require('passport');
 const Students = require('../models/students');
 const Teachers = require('../models/teachers');
+const { isNotLoggedIn } = require('../middlewares');
 
 exports.s_signup = async (req, res, next) => {
     console.log(req.body)
@@ -73,13 +74,23 @@ exports.signin = (req, res, next) => {
             req.session.userRole = user.s_id ? 'student' : 'teacher';
 
             const userType = req.session.userRole;
-            
+            const userId = req.session.userId;
+
             console.log("세션 정보:", req.session);
 
-            return res.status(200).json({ userType });
+            return res.status(200).json({ userType, userId });
     });
   })(req, res, next);
 };
+
+exports.checkLoginStatus = (req, res) => {
+    if (req.isAuthenticated()) {  // passport.js에서 제공하는 함수로, 사용자가 로그인 되어 있는지 확인
+        return res.status(200).json({ isLoggedIn: true });
+    } else {
+        return res.status(200).json({ isLoggedIn: false });
+    }
+};
+
 
 exports.signout = (req, res) => {
     req.logout(() => {

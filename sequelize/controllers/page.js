@@ -1,7 +1,9 @@
 const Sequelize = require('sequelize');
 const db = require('../models');
+const passport = require('passport');
 
 exports.createLesson = async (req, res, next) => {
+    console.log(req.body);
     try {
         const {
             l_title,
@@ -12,8 +14,7 @@ exports.createLesson = async (req, res, next) => {
             l_class,
             l_place
         } = req.body;
-        const { t_id } = req.user;
-        // const t_id = 'qwe';
+        const { t_id } = req.user.dataValues;
 
         const lesson = await db.Lesson.create({
             l_title,
@@ -34,11 +35,9 @@ exports.createLesson = async (req, res, next) => {
 };
 
 exports.readLessons = async (req, res, next) => {
-    // console.log(req.body);
-    const { teacher } = req.params;
-    // const teacher = 'qwe';
+    const { t_id } = req.user.dataValues;
     try {
-        const lessons = await db.Lesson.findAll({ where: { t_id: teacher } });
+        const lessons = await db.Lesson.findAll({ where: { t_id } });
         res.status(200).json(lessons);
     } catch (error) {
         console.error(error);
@@ -47,9 +46,11 @@ exports.readLessons = async (req, res, next) => {
 };
 
 exports.readLesson = async (req, res, next) => {
-    const { teacher, id } = req.params;
+    console.log(req.params);
+    const { l_id } = req.params;
+    const { t_id } = req.user.dataValues;
     try {
-        const lesson = await db.Lesson.findOne({ where: { t_id: teacher, l_id: id } });
+        const lesson = await db.Lesson.findOne({ where: { t_id, l_id } });
         if (!lesson) {
             return res.status(404).json({ message: '수업을 찾을 수 없습니다.' });
         }
@@ -61,7 +62,11 @@ exports.readLesson = async (req, res, next) => {
 };
 
 exports.updateLesson = async (req, res, next) => {
-    const { id } = req.params;
+    // console.log(req.body);
+    // console.log(req.params.id);
+    // console.log(req.params);
+    // console.log(req.l_id);
+    const l_id = req.params.id;
     const {
         l_title,
         l_content,
@@ -71,11 +76,10 @@ exports.updateLesson = async (req, res, next) => {
         l_class,
         l_place
     } = req.body;
-    const { t_id } = req.user;
-    // const t_id = 'qwe';
+    const { t_id } = req.user.dataValues;
 
     try {
-        const lesson = await db.Lesson.findOne({ where: { l_id: id } });
+        const lesson = await db.Lesson.findOne({ where: { l_id } });
 
         if (!lesson) {
             return res.status(404).json({ message: '수업을 찾을 수 없습니다.' });
@@ -95,7 +99,7 @@ exports.updateLesson = async (req, res, next) => {
                 l_class,
                 l_place,
             },
-            { where: { l_id: id } }
+            { where: { l_id } }
         );
 
         res.status(200).json({ message: '수업이 성공적으로 업데이트되었습니다.' });
@@ -106,23 +110,21 @@ exports.updateLesson = async (req, res, next) => {
 };
 
 exports.createPerformance = async (req, res, next) => {
-    const { l_id } = req.params;
+    console.log(req.body.params.l_id);
+    console.log(req.params.id);
+    console.log(req.user.dataValues);
     console.log(req.body);
+    console.log(req.params);
+    const l_id = req.body.params.l_id;
+    const { t_id } = req.user.dataValues;
     
     const {
         p_title,
-        // p_type,
         p_place,
         p_content,
-        // p_criteria,
         p_startdate,
         p_enddate,
     } = req.body.params;
-    const { t_id } = req.user;
-    // const t_id = 'qwe';
-    // const l_id = 3
-
-    //console.log(p_title)
 
     try {
         const lesson = await db.Lesson.findOne({ where: { l_id, t_id } });
@@ -133,10 +135,8 @@ exports.createPerformance = async (req, res, next) => {
     
         const performance = await db.Performance.create({
             p_title,
-            // p_type,
             p_place,
             p_content,
-            // p_criteria,
             p_startdate,
             p_enddate,
             l_id,
@@ -151,11 +151,13 @@ exports.createPerformance = async (req, res, next) => {
 
 exports.readPerformances = async (req, res, next) => {
     console.log(req.body);
-    const { lesson } = req.params;
-    // const lesson = 3;
+    console.log(req.params);
+    // console.log(req.params.id)
+    // console.log(req.params.lesson);
+    const l_id = req.params.lesson;
     try {
         const performances = await db.Performance.findAll({
-            where: { l_id: lesson },
+            where: { l_id },
             order: [['p_startdate', 'DESC']]
         });
         res.status(200).json(performances);
@@ -166,11 +168,11 @@ exports.readPerformances = async (req, res, next) => {
 };
 
 exports.readPerformance = async (req, res, next) => {
-    const { lesson, id } = req.params;
+    const { l_id, p_id } = req.params;
 
     try {
         const performance = await db.Performance.findOne({
-            where: { l_id: lesson, p_id: id },
+            where: { l_id, p_id },
             // include: [{ model: db.Lesson, attributes: ['l_title'] }],
         });
 
@@ -197,8 +199,7 @@ exports.updatePerformance = async (req, res, next) => {
         p_enddate,
         p_id,
     } = req.body;
-    // const { t_id } = req.user;
-    const t_id = 'www';
+    const { t_id } = req.user.dataValues;
 
     try {
         const performance = await db.Performance.findOne({ where: { p_id: p_id } });
@@ -416,7 +417,11 @@ exports.updateEvaluationCheck = async (req, res, next) => {
 };
 
 exports.renderProfile = (req, res) => {
-    res.status(200).send("프로필");
+    if (req.isAuthenticated()) {
+        const userType = req.session.userRole;
+        const userId = req.session.userId;
+        return res.status(200).json({ userType, userId });
+    }
 };
 
 exports.renderTeacherpage = (req, res) => {

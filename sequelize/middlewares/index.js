@@ -1,5 +1,4 @@
 exports.isLoggedIn = (req, res, next) => {
-    
     if (req.isAuthenticated()) {
         next();
     } else {
@@ -27,14 +26,15 @@ exports.corsDomain = async (req, res, next) => {
 }
 
 exports.isTeacher = (req, res, next) => {
-    if (req.isAuthenticated() && req.user.role === 'teacher') {
+    console.log(req.session.userRole);
+    if (req.session.userRole === 'teacher') {
         return next();
     }
     return res.status(403).send('선생님만 접근 가능합니다.');
 };
 
 exports.isStudent = (req, res, next) => {
-    if (req.isAuthenticated() && req.user.role === 'student') {
+    if (req.session.userRole === 'student') {
         return next();
     }
     return res.status(403).send('학생만 접근 가능합니다.');
