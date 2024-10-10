@@ -167,8 +167,36 @@ exports.readPerformances = async (req, res, next) => {
     }
 };
 
+exports.WebreadPerformances = async (req, res, next) => {
+    const t_id = req.user.dataValues.t_id;
+    try {
+        const lessons = await db.Lesson.findAll({
+            where: { t_id },
+            attributes: ['l_id'],
+        });
+
+        const lessonIds = lessons.map(lesson => lesson.l_id);
+
+        const performances = await db.Performance.findAll({
+            where: {
+                l_id: lessonIds
+            },
+            order: [['p_startdate', 'DESC']]
+        });
+
+        res.status(200).json(performances);
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+};
+
+
 exports.readPerformance = async (req, res, next) => {
-    const { l_id, p_id } = req.params;
+    console.log(req.params);
+    // const { l_id, p_id } = req.params;
+    const l_id = req.params.lesson;
+    const p_id = req.params.id;
 
     try {
         const performance = await db.Performance.findOne({

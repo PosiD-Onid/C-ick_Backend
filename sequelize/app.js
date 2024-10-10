@@ -7,6 +7,7 @@ const nunjucks = require('nunjucks');
 const dotenv = require('dotenv');
 const passport = require('passport');
 const cors = require('cors')
+const { swaggerUi, specs } = require("./swagger/swagger")
 
 dotenv.config();
 const apiRouter = require('./routes/api')
@@ -16,6 +17,7 @@ const { sequelize } = require('./models');
 const passportConfig = require('./passport');
 
 const app = express();
+
 
 // app.use(cors({
 //     origin: req.get('origin'),
@@ -54,6 +56,12 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs))
+
+/**
+ * @path {GET} http://localhost:7221/api
+ * @description 요청 데이터 값이 없고 반환 값이 있는 GET Method
+ */
 app.use('/api', apiRouter)
 app.use('/', pageRouter);
 app.use('/auth', authRouter);
