@@ -117,7 +117,7 @@ exports.createPerformance = async (req, res, next) => {
     console.log(req.params);
     const l_id = req.body.params.l_id;
     const { t_id } = req.user.dataValues;
-    
+
     const {
         p_title,
         p_place,
@@ -132,7 +132,7 @@ exports.createPerformance = async (req, res, next) => {
         if (!lesson) {
             return res.status(403).json({ message: '수업이 존재하지 않거나 권한이 없습니다.' });
         }
-    
+
         const performance = await db.Performance.create({
             p_title,
             p_place,
@@ -168,6 +168,8 @@ exports.readPerformances = async (req, res, next) => {
 };
 
 exports.WebreadPerformances = async (req, res, next) => {
+    console.log(req.user.dataValues.t_id);
+    console.log(req.user);
     const t_id = req.user.dataValues.t_id;
     try {
         const lessons = await db.Lesson.findAll({
@@ -222,6 +224,7 @@ exports.updatePerformance = async (req, res, next) => {
         p_title,
         p_type,
         p_content,
+        p_place,
         p_criteria,
         p_startdate,
         p_enddate,
@@ -253,6 +256,7 @@ exports.updatePerformance = async (req, res, next) => {
                 p_title,
                 p_type,
                 p_content,
+                p_place,
                 p_criteria,
                 p_startdate,
                 p_enddate,
@@ -262,7 +266,7 @@ exports.updatePerformance = async (req, res, next) => {
             }
         );
 
-         if (result[0] === 0) {
+        if (result[0] === 0) {
             return res.status(404).json({ message: '수행평가 업데이트 실패 또는 데이터가 없습니다.' });
         }
 
@@ -275,63 +279,63 @@ exports.updatePerformance = async (req, res, next) => {
 
 exports.createEvaluation = async (req, res, next) => {
     // if (req.user && req.user.role === 'teacher') {
-        const {
-            e_score,
-            e_check,
-            s_classof,
-            p_id
-        } = req.body;
+    const {
+        e_score,
+        e_check,
+        s_classof,
+        p_id
+    } = req.body;
 
-        try {
-            const classofNumber = parseInt(s_classof, 10); 
+    try {
+        const classofNumber = parseInt(s_classof, 10);
 
-            if (isNaN(classofNumber)) {
-                return res.status(400).json({ message: 's_classof 값이 유효하지 않습니다.' });
-            }
-    
-            // p_id로 수행평가를 찾음
-            const performance = await db.Performance.findOne({ where: { p_id } });
-    
-            if (!performance) {
-                return res.status(404).json({ message: '수행평가를 찾을 수 없습니다.' });
-            }
-    
-            // 앞 두 자리 확인을 위해 classofNumber를 문자열로 변환
-            const classGroupPrefix = classofNumber.toString().slice(0, 2);
-    
-            // 해당하는 학급의 학생들 조회
-            const students = await db.Students.findAll({
-                where: {
-                    s_classof: {
-                        [Sequelize.Op.like]: `${classGroupPrefix}%`
-                    }
-                }
-            });
-    
-            if (students.length === 0) {
-                return res.status(404).json({ message: '해당 학급에 속하는 학생이 없습니다.' });
-            }
-    
-            // 해당 학생들에 대해 평가 생성
-            const evaluation = await Promise.all(
-                students.map(student =>
-                    db.Evaluation.create({
-                        e_score,
-                        e_check,
-                        s_classof: student.s_classof,
-                        s_name: student.s_name, // 학생의 s_name 추가
-                        p_id,
-                        p_title: performance.p_title // 수행평가의 p_title 추가
-                    })
-                )
-            );
-    
-
-            res.status(201).json({ message: '수행평가점수가 성공적으로 생성되었습니다.', evaluation });
-        } catch (error) {
-            console.error(error);
-            next(error);
+        if (isNaN(classofNumber)) {
+            return res.status(400).json({ message: 's_classof 값이 유효하지 않습니다.' });
         }
+
+        // p_id로 수행평가를 찾음
+        const performance = await db.Performance.findOne({ where: { p_id } });
+
+        if (!performance) {
+            return res.status(404).json({ message: '수행평가를 찾을 수 없습니다.' });
+        }
+
+        // 앞 두 자리 확인을 위해 classofNumber를 문자열로 변환
+        const classGroupPrefix = classofNumber.toString().slice(0, 2);
+
+        // 해당하는 학급의 학생들 조회
+        const students = await db.Students.findAll({
+            where: {
+                s_classof: {
+                    [Sequelize.Op.like]: `${classGroupPrefix}%`
+                }
+            }
+        });
+
+        if (students.length === 0) {
+            return res.status(404).json({ message: '해당 학급에 속하는 학생이 없습니다.' });
+        }
+
+        // 해당 학생들에 대해 평가 생성
+        const evaluation = await Promise.all(
+            students.map(student =>
+                db.Evaluation.create({
+                    e_score,
+                    e_check,
+                    s_classof: student.s_classof,
+                    s_name: student.s_name, // 학생의 s_name 추가
+                    p_id,
+                    p_title: performance.p_title // 수행평가의 p_title 추가
+                })
+            )
+        );
+
+
+        res.status(201).json({ message: '수행평가점수가 성공적으로 생성되었습니다.', evaluation });
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
     // } else {
     //     res.status(403).send('평가를 생성할 권한이 없습니다.');
     // }
@@ -342,7 +346,7 @@ exports.readAllEvaluationsForTeacher = async (req, res, next) => {
     const { performance, s_classof } = req.params;
 
     try {
-        const classofNumber = parseInt(s_classof, 10); 
+        const classofNumber = parseInt(s_classof, 10);
 
         if (isNaN(classofNumber)) {
             return res.status(400).json({ message: 's_classof 값이 유효하지 않습니다.' });
@@ -372,22 +376,22 @@ exports.readAllEvaluationsForTeacher = async (req, res, next) => {
 // 학생의 모든 Evaluation 조회 (학생용)
 exports.readAllEvaluationsForStudent = async (req, res, next) => {
     // if (req.user && req.user.role === 'student') {
-        // const { s_classof } = req.user;
-        const s_classof = '0000';
+    // const { s_classof } = req.user;
+    const s_classof = '0000';
 
-        try {
-            const evaluations = await db.Evaluation.findAll({
-                where: { s_classof },
-                // include: [
-                //     { model: db.Performance, attributes: ['p_title'] },
-                // ],
-            });
+    try {
+        const evaluations = await db.Evaluation.findAll({
+            where: { s_classof },
+            // include: [
+            //     { model: db.Performance, attributes: ['p_title'] },
+            // ],
+        });
 
-            res.status(200).json(evaluations);
-        } catch (error) {
-            console.error(error);
-            next(error);
-        }
+        res.status(200).json(evaluations);
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
     // } else {
     //     res.status(403).send('접근 권한이 없습니다.');
     // }
@@ -396,24 +400,24 @@ exports.readAllEvaluationsForStudent = async (req, res, next) => {
 // Evaluation 업데이트 (선생님용: 점수 수정만 가능)
 exports.updateEvaluationScore = async (req, res, next) => {
     // if (req.user && req.user.role === 'teacher') {
-        const { e_id } = req.params;
-        const { e_score } = req.body;
+    const { e_id } = req.params;
+    const { e_score } = req.body;
 
 
-        try {
-            const evaluation = await db.Evaluation.findOne({ where: { e_id } });
+    try {
+        const evaluation = await db.Evaluation.findOne({ where: { e_id } });
 
-            if (!evaluation) {
-                return res.status(404).json({ message: '수행평가점수를 찾을 수 없습니다.' });
-            }
-
-            await evaluation.update({ e_score });
-
-            res.status(200).json({ message: '수행평가점수가 성공적으로 업데이트되었습니다.', evaluation });
-        } catch (error) {
-            console.error(error);
-            next(error);
+        if (!evaluation) {
+            return res.status(404).json({ message: '수행평가점수를 찾을 수 없습니다.' });
         }
+
+        await evaluation.update({ e_score });
+
+        res.status(200).json({ message: '수행평가점수가 성공적으로 업데이트되었습니다.', evaluation });
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
     // } else {
     //     res.status(403).send('점수를 수정할 권한이 없습니다.');
     // }
@@ -422,33 +426,72 @@ exports.updateEvaluationScore = async (req, res, next) => {
 // Evaluation 확인 상태 업데이트 (학생용: e_check만 수정 가능)
 exports.updateEvaluationCheck = async (req, res, next) => {
     // if (req.user && req.user.role === 'student') {
-        const { e_id } = req.params;
-        const { e_check } = req.body;
+    const { e_id } = req.params;
+    const { e_check } = req.body;
 
-        try {
-            const evaluation = await db.Evaluation.findOne({ where: { e_id } });
+    try {
+        const evaluation = await db.Evaluation.findOne({ where: { e_id } });
 
-            if (!evaluation) {
-                return res.status(404).json({ message: '수행평가점수를 찾을 수 없습니다.' });
-            }
-
-            await evaluation.update({ e_check });
-
-            res.status(200).json({ message: '수행평가점수 확인 상태가 성공적으로 업데이트되었습니다.', evaluation });
-        } catch (error) {
-            console.error(error);
-            next(error);
+        if (!evaluation) {
+            return res.status(404).json({ message: '수행평가점수를 찾을 수 없습니다.' });
         }
+
+        await evaluation.update({ e_check });
+
+        res.status(200).json({ message: '수행평가점수 확인 상태가 성공적으로 업데이트되었습니다.', evaluation });
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
     // } else {
     //     res.status(403).send('수정할 권한이 없습니다.');
     // }
 };
 
 exports.renderProfile = (req, res) => {
-    if (req.isAuthenticated()) {
-        const userType = req.session.userRole;
-        const userId = req.session.userId;
-        return res.status(200).json({ userType, userId });
+    const userType = req.session.userRole;
+    const userId = req.session.userId;
+    const t_username = req.user.dataValues.t_name;
+    const s_username = req.user.dataValues.s_name;
+    const usersubject = req.user.dataValues.t_subject;
+    console.log(req.user.dataValues);
+
+    if (userType === "teacher") {
+        return res.status(200).json({ userType, t_username, usersubject, userId });
+    } else {
+        return res.status(200).json({ userType, s_username, userId });
+    }
+};
+
+exports.renderPasswordChange = async (req, res) => {
+    const userId = req.session.userId;
+    const { currentPassword, newPassword } = req.body;
+    if (currentPassword && newPassword) {
+        const storedPassword = req.user.dataValues.t_pass;
+        if (currentPassword !== storedPassword) {
+            return res.status(400).json({ message: "현재 비밀번호가 일치하지 않습니다." });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ message: "비밀번호는 최소 8자 이상이어야 합니다." });
+        }
+
+        try {
+            console.log(userType);
+            if (userType === "teacher") {
+                const user = await db.Teachers.findOne({ where: { t_id: userId } });
+                await user.update({ t_pass: newPassword });
+            } else {
+                const user = await db.Students.findOne({ where: { s_id: userId } });
+                await user.update({ s_pass: newPassword });
+            }
+            return res.status(200).json({ message: "비밀번호가 성공적으로 변경되었습니다." });
+        } catch (err) {
+            console.error("DB 업데이트 오류:", err);
+            return res.status(500).json({ message: "비밀번호 변경 중 오류가 발생했습니다.", error: err });
+        }
+    } else {
+        return res.status(401).json({ message: "빈칸 없이 입력해주세요." });
     }
 };
 

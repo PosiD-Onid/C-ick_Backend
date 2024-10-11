@@ -5,6 +5,7 @@ const { isLoggedIn, isNotLoggedIn, isTeacher, isStudent } = require('../middlewa
 const { s_signup, t_signup, signin, checkLoginStatus, signout } = require('../controllers/auth');
 const {
     renderProfile,
+    renderPasswordChange,
     renderStudentsMain,
     renderTeachersMain,
     renderOnboarding,
@@ -152,15 +153,9 @@ router.get('/auth/checkLoginStatus', checkLoginStatus);
 
 router.get('/profile', isLoggedIn, renderProfile);
 
-router.get('/onboarding', isNotLoggedIn, renderOnboarding);
+router.put('/profile/passwordchange', isLoggedIn, renderPasswordChange)
 
-router.get('/teacherpage', (req, res, next) => {
-    if (req.user && req.user.role === 'teacher') {
-        return renderTeacherpage(req, res, next);
-    } else {
-        res.status(403).send('접근 권한이 없습니다');
-    }
-});
+router.get('/onboarding', isNotLoggedIn, renderOnboarding);
 
 /**
  * @swagger
@@ -623,7 +618,7 @@ router.get('/performance/lesson=:lesson', isLoggedIn, readPerformances);
  *       403:
  *         description: "로그인 필요"
  */
-router.get('/performance/teacher=:teacher', isLoggedIn, WebreadPerformances);
+router.get('/performance/teacher', isLoggedIn, WebreadPerformances);
 
 /**
  * @swagger
