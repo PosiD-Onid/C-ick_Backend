@@ -464,31 +464,50 @@ exports.renderProfile = (req, res) => {
 };
 
 exports.renderPasswordChange = async (req, res) => {
+    const userType = req.session.userRole;
     const userId = req.session.userId;
     const { currentPassword, newPassword } = req.body;
+    console.log(userType, userId);
+    console.log(currentPassword, newPassword);
     if (currentPassword && newPassword) {
-        const storedPassword = req.user.dataValues.t_pass;
-        if (currentPassword !== storedPassword) {
-            return res.status(400).json({ message: "현재 비밀번호가 일치하지 않습니다." });
-        }
+        if (userType === "teacher") {
+            const storedPassword = req.user.dataValues.t_pass;
+            if (currentPassword !== storedPassword) {
+                return res.status(400).json({ message: "현재 비밀번호가 일치하지 않습니다." });
+            }
 
-        if (newPassword.length < 8) {
-            return res.status(400).json({ message: "비밀번호는 최소 8자 이상이어야 합니다." });
-        }
+            if (newPassword.length < 8) {
+                return res.status(400).json({ message: "비밀번호는 최소 8자 이상이어야 합니다." });
+            }
 
-        try {
-            console.log(userType);
-            if (userType === "teacher") {
+            try {
+                console.log(userType);
                 const user = await db.Teachers.findOne({ where: { t_id: userId } });
                 await user.update({ t_pass: newPassword });
-            } else {
-                const user = await db.Students.findOne({ where: { s_id: userId } });
-                await user.update({ s_pass: newPassword });
+            } catch (err) {
+                console.error("DB 업데이트 오류:", err);
+                return res.status(500).json({ message: "비밀번호 변경 중 오류가 발생했습니다.", error: err });
             }
             return res.status(200).json({ message: "비밀번호가 성공적으로 변경되었습니다." });
-        } catch (err) {
-            console.error("DB 업데이트 오류:", err);
-            return res.status(500).json({ message: "비밀번호 변경 중 오류가 발생했습니다.", error: err });
+        } else {
+            const storedPassword = req.user.dataValues.s_pass;
+            if (currentPassword !== storedPassword) {
+                return res.status(400).json({ message: "현재 비밀번호가 일치하지 않습니다." });
+            }
+
+            if (newPassword.length < 8) {
+                return res.status(400).json({ message: "비밀번호는 최소 8자 이상이어야 합니다." });
+            }
+
+            try {
+                console.log(userType);
+                const user = await db.Students.findOne({ where: { s_id: userId } });
+                await user.update({ s_pass: newPassword });
+                return res.status(200).json({ message: "비밀번호가 성공적으로 변경되었습니다." });
+            } catch (err) {
+                console.error("DB 업데이트 오류:", err);
+                return res.status(500).json({ message: "비밀번호 변경 중 오류가 발생했습니다.", error: err });
+            }
         }
     } else {
         return res.status(401).json({ message: "빈칸 없이 입력해주세요." });
