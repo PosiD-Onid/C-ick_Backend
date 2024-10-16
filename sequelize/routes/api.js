@@ -17,6 +17,7 @@ const {
     createPerformance,
     readPerformances,
     WebreadPerformances,
+    readPerformancesData,
     readPerformance,
     updatePerformance,
     createEvaluation,
@@ -619,6 +620,8 @@ router.get('/performance/lesson=:lesson', isLoggedIn, readPerformances);
  *         description: "로그인 필요"
  */
 router.get('/performance/teacher', isLoggedIn, WebreadPerformances);
+
+router.get('/performance/classof', isLoggedIn, readPerformancesData);
 
 /**
  * @swagger

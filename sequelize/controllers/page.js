@@ -193,6 +193,36 @@ exports.WebreadPerformances = async (req, res, next) => {
     }
 };
 
+exports.readPerformancesData = async (req, res, next) => {
+    const classof = req.user.dataValues.s_classof;
+    const l_grade = Math.floor(classof / 1000);
+    const l_class = Math.floor((classof % 1000) / 100);
+    console.log("----------------");
+    console.log(l_grade, l_class);
+    console.log("----------------");
+    try {
+        const lessons = await db.Lesson.findAll({
+            where: { l_grade, l_class },
+            attributes: ['l_id'],
+        });
+
+        const lessonIds = lessons.map(lesson => lesson.l_id);
+
+        console.log(lessonIds);
+        const performances = await db.Performance.findAll({
+            where: {
+                l_id: lessonIds
+            },
+            order: [['p_startdate', 'DESC']]
+        });
+
+        res.status(200).json(performances);
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+};
+
 
 exports.readPerformance = async (req, res, next) => {
     console.log(req.params);
@@ -454,12 +484,13 @@ exports.renderProfile = (req, res) => {
     const t_username = req.user.dataValues.t_name;
     const s_username = req.user.dataValues.s_name;
     const usersubject = req.user.dataValues.t_subject;
+    const classof = req.user.dataValues.s_classof;
     console.log(req.user.dataValues);
 
     if (userType === "teacher") {
         return res.status(200).json({ userType, t_username, usersubject, userId });
     } else {
-        return res.status(200).json({ userType, s_username, userId });
+        return res.status(200).json({ userType, s_username, userId, classof });
     }
 };
 
