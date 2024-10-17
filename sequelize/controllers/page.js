@@ -45,6 +45,27 @@ exports.readLessons = async (req, res, next) => {
     }
 };
 
+exports.readLessonsData = async (req, res, next) => {
+    const classof = req.user.dataValues.s_classof;
+    const l_grade = Math.floor(classof / 1000);
+    const l_class = Math.floor((classof % 1000) / 100);
+    console.log("----------------");
+    console.log(l_grade, l_class);
+    console.log("----------------");
+    try {
+        const lessons = await db.Lesson.findAll({
+            where: { l_grade, l_class },
+            order: [['l_year', 'DESC'], ['l_semester', 'DESC']]
+        });
+
+        console.log(lessons);
+        res.status(200).json(lessons);
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+};
+
 exports.readLesson = async (req, res, next) => {
     console.log(req.params);
     const { l_id } = req.params;
@@ -55,6 +76,28 @@ exports.readLesson = async (req, res, next) => {
             return res.status(404).json({ message: '수업을 찾을 수 없습니다.' });
         }
         res.status(200).json(lesson);
+    } catch (error) {
+        console.error(error);
+        next(error);
+    }
+};
+
+exports.readLessonData = async (req, res, next) => {
+    const classof = req.user.dataValues.s_classof;
+    const l_grade = Math.floor(classof / 1000);
+    const l_class = Math.floor((classof % 1000) / 100);
+    const l_id = parseInt(req.params.id, 10);
+    console.log("--------------------");
+    console.log(l_grade, l_class, l_id);
+    console.log("--------------------");
+    console.log(req.params);
+    try {
+        const lessons = await db.Lesson.findOne({
+            where: { l_grade, l_class, l_id },
+        });
+
+        console.log(lessons);
+        res.status(200).json(lessons);
     } catch (error) {
         console.error(error);
         next(error);
@@ -226,14 +269,12 @@ exports.readPerformancesData = async (req, res, next) => {
 
 exports.readPerformance = async (req, res, next) => {
     console.log(req.params);
-    // const { l_id, p_id } = req.params;
     const l_id = req.params.lesson;
     const p_id = req.params.id;
 
     try {
         const performance = await db.Performance.findOne({
             where: { l_id, p_id },
-            // include: [{ model: db.Lesson, attributes: ['l_title'] }],
         });
 
         if (!performance) {

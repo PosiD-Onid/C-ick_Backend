@@ -9,10 +9,11 @@ const {
     renderStudentsMain,
     renderTeachersMain,
     renderOnboarding,
-    renderTeacherpage,
     createLesson,
     readLessons,
+    readLessonsData,
     readLesson,
+    readLessonData,
     updateLesson,
     createPerformance,
     readPerformances,
@@ -313,6 +314,8 @@ router.post('/lesson/create', isLoggedIn, isTeacher, createLesson);
  */
 router.get('/lesson/teacher=:teacher', isLoggedIn, readLessons);
 
+router.get('/lesson/classof', isLoggedIn, readLessonsData);
+
 /**
  * @swagger
  * /lesson/teacher={teacher}/{id}:
@@ -381,6 +384,8 @@ router.get('/lesson/teacher=:teacher', isLoggedIn, readLessons);
  *         description: "로그인 필요"
  */
 router.get('/lesson/teacher=:teacher/:id', isLoggedIn, isTeacher, readLesson);
+
+router.get('/lesson/classof/:id', isLoggedIn, readLessonData)
 
 /**
  * @swagger
