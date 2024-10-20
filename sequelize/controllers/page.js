@@ -185,6 +185,7 @@ exports.createPerformance = async (req, res, next) => {
             l_id,
         });
 
+        console.log(performance);
         res.status(201).json({ message: '수행평가가 성공적으로 생성되었습니다.', performance });
     } catch (error) {
         console.error(error);
@@ -277,11 +278,22 @@ exports.readPerformance = async (req, res, next) => {
             where: { l_id, p_id },
         });
 
+        const lessontitle = await db.Lesson.findOne({
+            where: { l_id },
+            attributes: ['l_title'],
+        });
+
         if (!performance) {
             return res.status(404).json({ message: '수행평가를 찾을 수 없습니다.' });
         }
 
-        res.status(200).json(performance);
+        const result = {
+            lessontitle: lessontitle.l_title,
+            performance
+        };
+
+        console.log(result);
+        res.status(200).json(result);
     } catch (error) {
         console.error(error);
         next(error);
@@ -289,19 +301,16 @@ exports.readPerformance = async (req, res, next) => {
 };
 
 exports.updatePerformance = async (req, res, next) => {
-    // console.log(req.body);
-    const { id } = req.params;
+    console.log(req.body);
     const {
         p_title,
-        p_type,
         p_content,
         p_place,
-        p_criteria,
         p_startdate,
         p_enddate,
         p_id,
+        l_id
     } = req.body;
-    const { t_id } = req.user.dataValues;
 
     try {
         const performance = await db.Performance.findOne({ where: { p_id: p_id } });
@@ -310,25 +319,18 @@ exports.updatePerformance = async (req, res, next) => {
             return res.status(404).json({ message: '수행평가를 찾을 수 없습니다.' });
         }
 
-        const lesson = await db.Lesson.findOne({ where: { l_id: performance.l_id } });
+        const lesson = await db.Lesson.findOne({ where: { l_id } });
 
         if (!lesson) {
             return res.status(404).json({ message: '관련된 수업을 찾을 수 없습니다.' });
         }
 
-        // if (lesson.t_id !== t_id) {
-        //     return res.status(403).json({ message: '이 수행평가를 수정할 권한이 없습니다.' });
-        // }
-
-        // 여기서 출력이 안됨
         console.log(req.body)
         const result = await db.Performance.update(
             {
                 p_title,
-                p_type,
                 p_content,
                 p_place,
-                p_criteria,
                 p_startdate,
                 p_enddate,
             },

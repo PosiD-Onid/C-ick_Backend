@@ -42,7 +42,7 @@ exports.t_signup = async (req, res, next) => {
     console.log(req.body)
     const { t_id, t_name, t_subject, t_pass } = req.body;
 
-    if (/\s/.test(t_id) || /\s/.test(t_name) || /\s/.test(t_pass) || /\s/.test(t_subject)) {
+    if (/\s/.test(t_id) || /\s/.test(t_name) || /\s/.test(t_pass)) {
         return res.status(400).send('공백없이 입력해주세요.');
     }
 
