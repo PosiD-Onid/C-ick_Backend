@@ -72,10 +72,10 @@ class Evaluation extends Sequelize.Model {
     }
 
     static associations(db) {
-        db.Evaluation.belongsTo(db.Students, { foreignKey: 's_classof', targetKey: 's_classof' }); // 학급으로 연결
-        db.Evaluation.belongsTo(db.Students, { foreignKey: 's_name', targetKey: 's_name' }); // ID로 연결
-        db.Evaluation.belongsTo(db.Performance, { foreignKey: 'p_id', targetKey: 'p_id' }); // 수행평가 ID로 연결
-        db.Evaluation.belongsTo(db.Performance, { foreignKey: 'p_title', targetKey: 'p_title' }); // 수행평가 제목으로 연결
+        db.Evaluation.belongsTo(db.Students, { foreignKey: 's_classof', targetKey: 's_classof' });
+        db.Evaluation.belongsTo(db.Students, { foreignKey: 's_name', targetKey: 's_name' });
+        db.Evaluation.belongsTo(db.Performance, { foreignKey: 'p_id', targetKey: 'p_id' });
+        db.Evaluation.belongsTo(db.Performance, { foreignKey: 'p_title', targetKey: 'p_title' });
     }
     
 }
